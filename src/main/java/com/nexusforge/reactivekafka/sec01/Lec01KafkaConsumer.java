@@ -30,6 +30,8 @@ public class Lec01KafkaConsumer {
         // uses - non deamon thread...
         KafkaReceiver.create(options).receive()
                 .doOnNext(r -> log.info("key: {}, value:{}", r.key(), r.value()))
+                .doOnNext(r -> r.receiverOffset().acknowledge())
+                // commit interval.ms = 5000 ms. Ackowledge intervals
                 .subscribe();
     }
 }
