@@ -13,6 +13,7 @@ import java.util.Map;
 public class Lec08KafkaConsumerOffSeek {
 
     private static final Logger log = LoggerFactory.getLogger(Lec08KafkaConsumerOffSeek.class);
+
     public static void main(String[] args) {
         var consumerConfig = Map.<String, Object>of(
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092",
@@ -27,9 +28,10 @@ public class Lec08KafkaConsumerOffSeek {
         var options = ReceiverOptions.create(consumerConfig)
                 .addAssignListener(c -> {
                     c.forEach(r -> log.info("assigned {} ", r.position()));
-                    // for each partition, go back to the last 2 items and
-                    // start reading from there
-                    c.forEach(r -> r.seek(r.position() -2 ));
+                    // Get the Last 2 items from partition number 2.
+                    c.stream().filter(r -> r.topicPartition().partition() == 2)
+                            .findFirst()
+                            .ifPresent(r -> r.seek(r.position() - 2));
                 })
                 .subscription(List.of("order-events"));
 
