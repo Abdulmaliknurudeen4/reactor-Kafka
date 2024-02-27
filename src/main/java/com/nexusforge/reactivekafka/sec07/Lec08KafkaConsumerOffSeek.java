@@ -1,7 +1,6 @@
-package com.nexusforge.reactivekafka.sec06;
+package com.nexusforge.reactivekafka.sec07;
 
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.RangeAssignor;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,23 +10,27 @@ import reactor.kafka.receiver.ReceiverOptions;
 import java.util.List;
 import java.util.Map;
 
-public class KafkaConsumer {
+public class Lec08KafkaConsumerOffSeek {
 
-    private static final Logger log = LoggerFactory.getLogger(KafkaConsumer.class);
-
-    public static void start(String instanceId) {
+    private static final Logger log = LoggerFactory.getLogger(Lec08KafkaConsumerOffSeek.class);
+    public static void main(String[] args) {
         var consumerConfig = Map.<String, Object>of(
                 ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092",
                 ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
                 ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
                 ConsumerConfig.GROUP_ID_CONFIG, "demo-group124",
                 ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest",
-                ConsumerConfig.GROUP_INSTANCE_ID_CONFIG, instanceId,
-                ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false,
-                ConsumerConfig.PARTITION_ASSIGNMENT_STRATEGY_CONFIG, RangeAssignor.class.getName()
+                ConsumerConfig.GROUP_INSTANCE_ID_CONFIG, "1",
+                ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false
         );
 
         var options = ReceiverOptions.create(consumerConfig)
+                .addAssignListener(c -> {
+                    c.forEach(r -> log.info("assigned {} ", r.position()));
+                    // for each partition, go back to the last 2 items and
+                    // start reading from there
+                    c.forEach(r -> r.seek(r.position() -2 ));
+                })
                 .subscription(List.of("order-events"));
 
         // uses - non deamon thread...
