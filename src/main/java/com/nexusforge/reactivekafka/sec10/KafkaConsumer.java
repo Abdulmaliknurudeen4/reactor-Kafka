@@ -20,7 +20,7 @@ public class KafkaConsumer {
 
     public static void main(String[] args) {
         var consumerConfig = Map.<String, Object>of(
-                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092",
+                ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:8081",
                 ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
                 ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
                 ConsumerConfig.GROUP_ID_CONFIG, "demo-group",
