@@ -14,6 +14,8 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
+import static reactor.core.scheduler.Schedulers.boundedElastic;
+
 public class KafkaConsumer {
 
     private static final Logger log = LoggerFactory.getLogger(KafkaConsumer.class);
@@ -43,9 +45,12 @@ public class KafkaConsumer {
 
     private static Mono<Void> batchProcess(Flux<ConsumerRecord<Object, Object>> flux) {
         return flux
+                .publishOn(boundedElastic())
                 .doFirst(() -> log.info("---------------"))
                 .doOnNext(r -> log.info("key: {}, value:{}", r.key(), r.value()))
                 .then(Mono.delay(Duration.ofSeconds(1))).then();
 
+        //flatmap has ordering issues when messages are split
+        // over fluxes
     }
 }
