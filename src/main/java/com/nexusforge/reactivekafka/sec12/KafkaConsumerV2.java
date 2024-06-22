@@ -49,7 +49,7 @@ public class KafkaConsumerV2 {
     private static Mono<Void> process(ReceiverRecord<Object, Object> receiverRecord) {
         return Mono.just(receiverRecord)
                 .doOnNext(r -> {
-                    var index = ThreadLocalRandom.current().nextInt(1, 100);
+                    var index = ThreadLocalRandom.current().nextInt(1, 10);
                     log.info("key: {}, index{}, value:{}", r.key(), index, r.value().toString().toCharArray()[index]);
                 })
                 .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(1))
