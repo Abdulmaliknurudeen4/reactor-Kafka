@@ -6,7 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.kafka.receiver.KafkaReceiver;
 import reactor.kafka.receiver.ReceiverOptions;
+import reactor.util.retry.Retry;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -32,8 +34,8 @@ public class KafkaConsumer {
         KafkaReceiver.create(options).receive()
                 .doOnNext(r -> log.info("key: {}, value:{}", r.key(), r.value().toString().toCharArray()[45]))
                 .doOnNext(r -> r.receiverOffset().acknowledge())
-                // commit interval.ms = 5000 ms. Ackowledge intervals
-                .subscribe();
+                .retryWhen(Retry.fixedDelay(3, Duration.ofSeconds(3)))
+                .blockLast(); // just for demo
     }
 
     // if server shutsdown or network issues before acknowledgement whne
