@@ -7,19 +7,37 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.kafka.sender.KafkaSender;
 import reactor.kafka.sender.SenderRecord;
+import reactor.kafka.sender.SenderResult;
 
 import java.util.function.Predicate;
 
 public class TransferEventProcessor {
     private static final Logger log = LoggerFactory.getLogger(TransferEventProcessor.class);
-    private final KafkaSender<String, String> receiver;
+    private final KafkaSender<String, String> sender;
 
     public TransferEventProcessor(KafkaSender<String, String> receiver) {
-        this.receiver = receiver;
+        this.sender = receiver;
     }
 
-    public void process(Flux<TransferEvent> flux) {
+    public Flux<SenderResult<String>> process(Flux<TransferEvent> flux) {
+       return flux.concatMap(this::validate)
+                .concatMap(this::sendTransaction);
 
+
+    }
+
+    private Mono<SenderResult<String>> sendTransaction(TransferEvent event){
+        var senderRecords = this.toSenderRecords(event);
+        var manager = this.sender.transactionManager();
+
+        // transaction process blocks.
+        return manager.begin()
+                .then(
+                        this.sender.send(senderRecords)
+                                .concatWith(Mono.fromRunnable(event.ackowledge()))
+                                .concatWith(manager.commit()).last())
+                .doOnError(ex -> log.error(ex.getMessage()))
+                .onErrorResume(ex -> manager.abort());
     }
 
     // 5 doesn't have money to transfer
@@ -37,7 +55,6 @@ public class TransferEventProcessor {
         var pr2 = new ProducerRecord<>("transaction-events", event.key(), "%s-%s".formatted(event.from(), event.amount()));
         var sr1 = SenderRecord.create(pr1, pr1.key());
         var sr2 = SenderRecord.create(pr2, pr2.key());
-
         return Flux.just(sr1, sr2);
     }
 }
