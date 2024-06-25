@@ -56,6 +56,7 @@ public class TransferEventProcessor {
         var pr2 = new ProducerRecord<>("transaction-events", event.key(), "%s-%s".formatted(event.from(), event.amount()));
         var sr1 = SenderRecord.create(pr1, pr1.key());
         var sr2 = SenderRecord.create(pr2, pr2.key());
-        return Flux.just(sr1, sr2);
+        return Flux.just(sr1).concatWith(Mono.delay(Duration.ofSeconds(1)).then(Mono.error(new RuntimeException("oops"))))
+                .concatWith(Mono.just(sr2));
     }
 }

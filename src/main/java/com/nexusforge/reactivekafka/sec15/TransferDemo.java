@@ -38,8 +38,7 @@ public class TransferDemo {
                 ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
                 ConsumerConfig.GROUP_ID_CONFIG, "demo-group124",
                 ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest",
-                ConsumerConfig.GROUP_INSTANCE_ID_CONFIG, "1",
-                ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false
+                ConsumerConfig.GROUP_INSTANCE_ID_CONFIG, "1"
         );
 
         var options = ReceiverOptions.<String, String>create(consumerConfig)
