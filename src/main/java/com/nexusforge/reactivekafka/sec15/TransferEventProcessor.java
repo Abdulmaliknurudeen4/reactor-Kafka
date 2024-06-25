@@ -9,6 +9,7 @@ import reactor.kafka.sender.KafkaSender;
 import reactor.kafka.sender.SenderRecord;
 import reactor.kafka.sender.SenderResult;
 
+import java.time.Duration;
 import java.util.function.Predicate;
 
 public class TransferEventProcessor {
@@ -34,7 +35,7 @@ public class TransferEventProcessor {
         return manager.begin()
                 .then(
                         this.sender.send(senderRecords)
-                                .concatWith(Mono.fromRunnable(event.ackowledge()))
+                                .concatWith(Mono.delay(Duration.ofSeconds(1)).then(Mono.fromRunnable(event.ackowledge())))
                                 .concatWith(manager.commit()).last())
                 .doOnError(ex -> log.error(ex.getMessage()))
                 .onErrorResume(ex -> manager.abort());
