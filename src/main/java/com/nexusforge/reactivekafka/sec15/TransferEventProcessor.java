@@ -58,5 +58,9 @@ public class TransferEventProcessor {
         var sr2 = SenderRecord.create(pr2, pr2.key());
         return Flux.just(sr1).concatWith(Mono.delay(Duration.ofSeconds(1)).then(Mono.error(new RuntimeException("oops"))))
                 .concatWith(Mono.just(sr2));
+
+        // use a random transaction ID for all transaction scenrios
+        // if you stay longer that the transaction timeouts without
+        // commit and aborting, you'll have producerFenced Exception
     }
 }
