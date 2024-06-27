@@ -14,14 +14,15 @@ import java.util.List;
 public class KafkaConsumerConfig {
 
     @Bean
-    public ReceiverOptions<String, OrderEvent> receiverOptions(KafkaProperties kafkaProperties) {
-        return ReceiverOptions.<String, OrderEvent>create(kafkaProperties.buildConsumerProperties(null))
+    public ReceiverOptions<String, DummyOrder> receiverOptions(KafkaProperties kafkaProperties) {
+        return ReceiverOptions.<String, DummyOrder>create(kafkaProperties.buildConsumerProperties(null))
                 .consumerProperty(JsonDeserializer.REMOVE_TYPE_INFO_HEADERS, "false")
+                .consumerProperty(JsonDeserializer.USE_TYPE_INFO_HEADERS, "false")
                 .subscription(List.of("order-events"));
     }
 
     @Bean
-    public ReactiveKafkaConsumerTemplate<String, OrderEvent> consumerTemplate(ReceiverOptions<String, OrderEvent> options) {
+    public ReactiveKafkaConsumerTemplate<String, DummyOrder> consumerTemplate(ReceiverOptions<String, DummyOrder> options) {
         return new ReactiveKafkaConsumerTemplate<>(options);
     }
 }
