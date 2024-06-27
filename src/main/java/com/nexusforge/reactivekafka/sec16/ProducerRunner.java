@@ -20,13 +20,13 @@ public class ProducerRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        this.orderFlux()
+       /* this.orderFlux()
                 .flatMap(oe -> this.template
                         .send("order-events",
                                 oe.orderID().toString(), oe))
                 .doOnNext(r -> log.info("result : {}", r.recordMetadata()))
                 .subscribe();
-
+*/
 
     }
 
