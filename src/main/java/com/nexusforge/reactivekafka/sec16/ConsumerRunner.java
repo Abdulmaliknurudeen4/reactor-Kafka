@@ -12,7 +12,7 @@ public class ConsumerRunner implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(ConsumerRunner.class);
     @Autowired
-    private ReactiveKafkaConsumerTemplate<String, String> template;
+    private ReactiveKafkaConsumerTemplate<String, OrderEvent> template;
 
     @Override
     public void run(String... args) throws Exception {
