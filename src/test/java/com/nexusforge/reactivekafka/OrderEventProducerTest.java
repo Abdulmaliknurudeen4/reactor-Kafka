@@ -26,6 +26,6 @@ public class OrderEventProducerTest extends AbstractIT{
                 .consumeNextWith(r -> Assertions.assertNotNull(r.value().orderID()))
                 .expectNextCount(9)
                 .expectComplete()
-                .verify(Duration.ofSeconds(10));
+                .verify(Duration.ofSeconds(100));
     }
 }

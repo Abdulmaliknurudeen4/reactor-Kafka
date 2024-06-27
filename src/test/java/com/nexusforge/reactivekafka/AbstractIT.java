@@ -16,7 +16,8 @@ import java.util.function.UnaryOperator;
 @SpringBootTest
 @EmbeddedKafka(
         partitions = 1,
-        topics = {"order-events"}
+        topics = {"order-events"},
+        bootstrapServersProperty = "spring.kafka.bootstrapServers"
 )
 //@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public abstract class AbstractIT {
