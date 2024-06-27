@@ -8,6 +8,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.kafka.test.condition.EmbeddedKafkaCondition;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -23,17 +24,20 @@ import java.util.List;
 import java.util.Map;
 
 @EmbeddedKafka(
-        ports = 9092,
-        partitions = 1
+        //ports = 9092,
+        partitions = 1,
+        brokerProperties = {"auto.create.topics.enable=false"},
+        topics = {"order-events"}
 )
 class EmbeddedKafkaPlayGroundTest {
 
     @Test
     void embeddedKafkaDemo() {
 
-        StepVerifier.create(Producer.run())
+        var brokers =EmbeddedKafkaCondition.getBroker().getBrokersAsString();
+        StepVerifier.create(Producer.run(brokers))
                 .verifyComplete();
-        StepVerifier.create(Consumer.run())
+        StepVerifier.create(Consumer.run(brokers))
                 .verifyComplete();
 
     }
@@ -41,9 +45,9 @@ class EmbeddedKafkaPlayGroundTest {
     private static class Consumer {
         private static final Logger log = LoggerFactory.getLogger(Consumer.class);
 
-        public static Mono<Void> run() {
+        public static Mono<Void> run(String brokers) {
             var consumerConfig = Map.<String, Object>of(
-                    ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092",
+                    ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers,
                     ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
                     ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class,
                     ConsumerConfig.GROUP_ID_CONFIG, "demo-group124",
@@ -68,9 +72,9 @@ class EmbeddedKafkaPlayGroundTest {
     private static class Producer {
         private static final Logger log = LoggerFactory.getLogger(Producer.class);
 
-        public static Mono<Void> run() {
+        public static Mono<Void> run(String brokers) {
             var producerConfig = Map.<String, Object>of(
-                    ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092",
+                    ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, brokers,
                     ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class,
                     ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class
             );
