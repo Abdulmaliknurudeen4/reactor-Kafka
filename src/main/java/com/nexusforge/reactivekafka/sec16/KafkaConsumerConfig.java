@@ -18,6 +18,7 @@ public class KafkaConsumerConfig {
         return ReceiverOptions.<String, DummyOrder>create(kafkaProperties.buildConsumerProperties(null))
                 .consumerProperty(JsonDeserializer.REMOVE_TYPE_INFO_HEADERS, "false")
                 .consumerProperty(JsonDeserializer.USE_TYPE_INFO_HEADERS, "false")
+                .consumerProperty(JsonDeserializer.VALUE_DEFAULT_TYPE, DummyOrder.class)
                 .subscription(List.of("order-events"));
     }
 
