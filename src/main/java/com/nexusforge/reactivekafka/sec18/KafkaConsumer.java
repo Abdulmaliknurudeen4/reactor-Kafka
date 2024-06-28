@@ -34,9 +34,9 @@ public class KafkaConsumer {
                             password="secret"
                             user_admin="secret"
                             user_client="client-secret";
-                    """,
-                SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, Paths.get("src/main/resources/kafka.truststore.jks").toAbsolutePath().toString(),
-                SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, "changeit"
+                    """
+//                SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, Paths.get("src/main/resources/kafka.truststore.jks").toAbsolutePath().toString(),
+//                SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, "changeit"
         );
 
         var options = ReceiverOptions.create(consumerConfig)
